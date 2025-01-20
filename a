@@ -1,0 +1,105 @@
+import 'package:flutter/material.dart';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: TicTacToe(),
+    );
+  }
+}
+
+class TicTacToe extends StatefulWidget {
+  @override
+  _TicTacToeState createState() => _TicTacToeState();
+}
+
+class _TicTacToeState extends State<TicTacToe> {
+  List<String> board = List.generate(9, (index) => '');
+  String currentPlayer = 'X';
+
+  void _handleTap(int index) {
+    setState(() {
+      if (board[index] == '') {
+        board[index] = currentPlayer;
+        currentPlayer = currentPlayer == 'X' ? 'O' : 'X';
+      }
+    });
+  }
+
+  String _checkWinner() {
+    // Verifica as linhas
+    for (int i = 0; i < 3; i++) {
+      if (board[i * 3] != '' &&
+          board[i * 3] == board[i * 3 + 1] &&
+          board[i * 3] == board[i * 3 + 2]) {
+        return board[i * 3];
+      }
+    }
+    // Verifica as colunas
+    for (int i = 0; i < 3; i++) {
+      if (board[i] != '' &&
+          board[i] == board[i + 3] &&
+          board[i] == board[i + 6]) {
+        return board[i];
+      }
+    }
+    // Verifica as diagonais
+    if (board[0] != '' && board[0] == board[4] && board[0] == board[8]) {
+      return board[0];
+    }
+    if (board[2] != '' && board[2] == board[4] && board[2] == board[6]) {
+      return board[2];
+    }
+    // Se não houver vencedor, retorna vazio
+    return '';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String winner = _checkWinner();
+
+    return Scaffold(
+      appBar: AppBar(title: Text('Jogo da Velha')),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          if (winner != '')
+            Text('$winner venceu!',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          if (winner == '' && board.every((e) => e != ''))
+            Text('Empate!',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          GridView.builder(
+            shrinkWrap: true,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 4,
+              mainAxisSpacing: 4,
+            ),
+            itemCount: 9,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () => _handleTap(index),
+                child: Container(
+                  margin: EdgeInsets.all(8),
+                  color: Colors.blueGrey[100],
+                  child: Center(
+                    child: Text(
+                      board[index],
+                      style:
+                          TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
